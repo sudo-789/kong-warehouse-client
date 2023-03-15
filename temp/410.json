@@ -1,0 +1,78 @@
+{
+  "name": "RSTLSS x CrypToadz #7029",
+  "tokenId": 410,
+  "description": "A small, warty, amphibious creature that resides in the metaverse.",
+  "external_url": "https://rstlss.xyz",
+  "animation_url": "https://rstlss-content.xyz/cryptoadz/410/index.html",
+  "image": "https://rstlss-content.xyz/cryptoadz/410/assets/image.png",
+  "properties": {
+    "rpm": [
+      {
+        "modelUrl": "https://rstlss-content.xyz/cryptoadz/410/assets/rpm-male.glb",
+        "gender": "male",
+        "iconUrl": "https://rstlss-content.xyz/cryptoadz/410/assets/image.png",
+        "type": "outfit"
+      },
+      {
+        "modelUrl": "https://rstlss-content.xyz/cryptoadz/410/assets/rpm-female.glb",
+        "gender": "female",
+        "iconUrl": "https://rstlss-content.xyz/cryptoadz/410/assets/image.png",
+        "type": "outfit"
+      }
+    ]
+  },
+  "reference": [
+    7029,
+    "m4"
+  ],
+  "version": 1,
+  "garment_types": "TOADALLY RARE HOODIE",
+  "garment_artists": "RSTLSS",
+  "garment_description": "A new endangered species has emerged from the swamp",
+  "glyph_count": 1,
+  "glyph_slots": "Back",
+  "glyph_types": "Projection",
+  "glyph_artists": "Gremplin",
+  "attributes": [
+    {
+      "trait_type": "Garment",
+      "value": "TOADALLY RARE HOODIE"
+    },
+    {
+      "trait_type": "Garment Artist",
+      "value": "RSTLSS"
+    },
+    {
+      "trait_type": "Glyph Artist",
+      "value": "Gremplin"
+    },
+    {
+      "trait_type": "Glyph Background",
+      "value": "Mercury Chill"
+    },
+    {
+      "trait_type": "Element",
+      "value": "Mercury"
+    },
+    {
+      "trait_type": "Colour",
+      "value": "Grey"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Bones"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Beanie"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Quite Rare 1/20"
+    }
+  ]
+}

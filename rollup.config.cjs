@@ -6,7 +6,15 @@ const pkg = require("./package.json");
 
 const roots = ["kong/index.ts"];
 const formats = ["cjs", "esm", "es"];
-const plugins = [typescriptPlugin(), nodeResolve(), commonjs()];
+const plugins = [
+    typescriptPlugin(),
+  nodeResolve(),
+  commonjs(),
+  require("rollup-plugin-serve")({
+    contentBase: ["dist"],
+    port: 8080
+  })
+];
 
 // e.g. lastPartOfPath("foo/bar/baz") -> "baz"
 function lastPartOfPath(path) {
