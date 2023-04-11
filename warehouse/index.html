@@ -23,8 +23,8 @@
           <button id="scan" class="scan-button" onClick="readKeyU2F();">
             Scan
           </button>
-          <button id="sign" class="sign-button" onClick="signU2F();">
-            Sign
+          <button id="sign" class="sign-button" onClick="setSignState();">
+            Start Signing
           </button>
         </div>
 
@@ -305,6 +305,36 @@
       async function readKeyU2F() {
         let res = await authU2F(fromHexString("02"));
         prepareVerify(res);
+      }
+
+      // Call sign function over and over when the toggle is pressed
+      let signState = false
+      let sign = 'Start Signing'
+
+      function setSignState() {
+        let buttonText = document.getElementById('sign')
+        console.log('setting sign state')
+        if (signState === true) {
+          signState = false
+          buttonText.innerText = 'Start Signing'
+        } else {
+          signState = true
+          buttonText.innerText = 'Signing...'
+        }
+        console.log(signState)
+      }
+
+      
+      setInterval(() => {
+        signToggle()
+      }, "5000");
+
+      function signToggle() {
+        if (signState) {
+          signU2F()
+        } else {
+          console.log('sign toggle false')
+        }
       }
 
       // Carry out a signature command against a HaLo.
