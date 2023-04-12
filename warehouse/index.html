@@ -17,8 +17,13 @@
         <div class="box">
           <p class="empty">Tap Sign and hold Chip to phone NFC antenna.</p>
         </div>
+        <div>
+          <p>Response:</p>
+          <p id="response"></p>
 
+        </div>
         <div class="scan-form">
+          
           <p class="feedback" id="feedback"></p>
           <input type="text" class="metadata-input" value="RSTLSS Master Tee" readonly>
           <button id="scan" class="scan-button" onClick="readKeyU2F();">
@@ -367,6 +372,10 @@
         var req = fromHexString(input);
         
         let res = await authU2F(req);
+
+        // Send response to front end
+        let response = document.getElementById('response')
+        response.innerText = res
 
         // Catch an error in authU2F
         if (res == 'An error occured, please check the console') {
