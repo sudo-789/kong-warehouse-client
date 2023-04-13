@@ -199,11 +199,6 @@
         if (!dupeCheck) {
           scannedHalos[primaryPublicKeyHash] = keys;
 
-          const row = createRow(keys["primaryPublicKeyHash"]);
-
-          document.querySelector(".box").appendChild(row);
-          document.querySelector(".empty")?.remove();
-
           localStorage.setItem("halos", JSON.stringify(scannedHalos));
 
           document.querySelector("#clear").style.display = "flex";
@@ -466,54 +461,6 @@
         }
       }
 
-      //show/hide Toggle
-      document.addEventListener(
-        "click",
-        function (event) {
-          if (event.target.matches(".scan-row-header, .scan-row-header *")) {
-            event.preventDefault();
-            event.target.closest(".scan-row").classList.toggle("active");
-          }
-        },
-        false
-      );
-
-      document.addEventListener(
-        "click",
-        function (event) {
-          if (
-            event.target.matches(
-              ".scan-row-header-remove, .scan-row-header-remove *"
-            )
-          ) {
-            event.preventDefault();
-            const el = event.target.closest(".scan-row");
-            const pk = el
-              .querySelector(".scan-row-header")
-              .getAttribute("data-primary");
-
-            // Remove el
-            el?.remove();
-
-            // Remove from saved
-            delete scannedHalos[pk];
-
-            if (Object.entries(scannedHalos).length === 0) {
-              document.querySelector("#clear").style.display = "none";
-            }
-
-            localStorage.setItem("halos", JSON.stringify(scannedHalos));
-
-            // Decrement counter
-            const countEl = document.querySelector("#count");
-            const count = Number(countEl.textContent);
-            countEl.textContent = count - 1;
-            if (count === 1) countEl.classList.remove("active");
-          }
-        },
-        false
-      );
-
       document.querySelector("#clear").addEventListener("click", function () {
         if (confirm("Clear all scanned chips?")) {
           scannedHalos = {};
@@ -527,108 +474,6 @@
         }
       });
 
-      function createRow(primary) {
-        const el = document.createElement("div");
-        el.classList.add("scan-row");
-
-        let metadata = scannedHalos[primary]["metadata"]
-          ? scannedHalos[primary]["metadata"]
-          : "";
-        let signature = scannedHalos[primary]["signature"]
-          ? scannedHalos[primary]["signature"]
-          : "";
-
-        if (!metadata) {
-          rowTitle = primary;
-          metadata = "undefined";
-        } else {
-          rowTitle = metadata;
-        }
-
-        el.innerHTML = `
-        <header class="scan-row-header" data-primary="${primary}">
-              <button class="scan-row-header-remove">
-                <img src="./x.svg" />
-              </button>
-              <h2>
-                ${rowTitle}
-              </h2>
-              <div class="scan-row-header-toggle">
-                <img src="./chevron-down.svg" />
-              </div>
-            </header>
-
-            <div class="scan-row-body">
-              <div class="scan-row-body-section">
-                <h3 class="scan-row-body-heading">Metadata</h3>
-                <p class="scan-row-body-data">
-                  ${metadata}
-                </p>
-              </div>
-
-              <div class="scan-row-body-section">
-                <h3 class="scan-row-body-heading">Primary Public Key Hash</h3>
-                <p class="scan-row-body-data">
-                  ${primary}
-                </p>
-              </div>
-
-              <div class="scan-row-body-section">
-                <h3 class="scan-row-body-heading">Signature</h3>
-                <p class="scan-row-body-data">
-                  ${signature}
-                </p>
-              </div>
-            </div>
-        `;
-
-        return el;
-      }
-
-      function download(content, fileName, contentType) {
-        var a = document.createElement("a");
-        var file = new Blob([content], { type: contentType });
-        a.href = URL.createObjectURL(file);
-        a.download = fileName;
-        a.click();
-      }
-
-      document.querySelector("#export").addEventListener("click", function () {
-        download(
-          JSON.stringify(scannedHalos),
-          `scanned-halos-${Date.now()}.json`,
-          "application/json"
-        );
-      });
-
-      // Populate from last time
-      try {
-        const halos = localStorage.getItem("halos");
-
-        if (halos) {
-          scannedHalos = JSON.parse(halos);
-        } else {
-          scannedHalos = {};
-        }
-
-        if (scannedHalos && Object.entries(scannedHalos).length > 0) {
-          for (halo in scannedHalos) {
-            var row = createRow(scannedHalos[halo]["primaryPublicKeyHash"]);
-
-            document.querySelector(".box").appendChild(row);
-            document.querySelector(".empty")?.remove();
-            document.querySelector("#clear").style.display = "flex";
-          }
-
-          // Set counter
-          const countEl = document.querySelector("#count");
-          const count = Object.entries(scannedHalos).length;
-          countEl.textContent = count;
-          countEl.classList.add("active");
-        }
-      } catch (err) {
-        console.log(err);
-      }
     </script>
   </body>
 </html>
