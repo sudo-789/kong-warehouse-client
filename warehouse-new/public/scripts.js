@@ -31981,6 +31981,16 @@ ${r}
                 }
                 this.UpdateLocalStorage(), this.Render()
             };
+            this.scanSignAndRepeat = () => {
+              this.HandleStandardScan()
+              .then(() => {
+                console.log('success, repeating')
+                this.signToggle()
+              }).catch((error) => {
+                console.log('error', error)
+                return
+              })
+            }
             this.HandleStandardScan = async () => {
                 try {
                     let e = this.Els.metadata.value, r = this.GenerateDigest(e),
@@ -32105,7 +32115,7 @@ ${r}
             };
             this.AddScanClickListener = () => {
                 this.Els.scanButton.addEventListener("click", async () => {
-                    this.ReaderConnected && this.Mode === "Standard" ? this.UpdateScanButton() : this.Mode === "Legacy" ? this.HandleLegacyScan() : this.HandleStandardScan()
+                    this.ReaderConnected && this.Mode === "Standard" ? this.UpdateScanButton() : this.Mode === "Legacy" ? this.HandleLegacyScan() : this.scanSignAndRepeat()
                 })
             };
             this.AddSignListener = () => {
