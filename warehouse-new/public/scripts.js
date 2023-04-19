@@ -32008,6 +32008,7 @@ ${r}
                 }
             };
             this.postPayload = async (message) => {
+                console.log(message);
                 this.updateLogField(`Uploading Results ${message.address}`);
                 const response = await fetch('https://74huogt4t1.execute-api.eu-west-2.amazonaws.com/default/master-tee-scan-endpoint', {
                     method: 'POST',
@@ -32019,12 +32020,10 @@ ${r}
                     })
                 });
 
-                if (response.ok) {
-                    this.updateLogField(`COMPLETE! ${message.address}`);
-                }
-                else {
-                    this.updateLogField(`Upload Failed, please retry signing`);
-                }
+                const logText = response.ok ? `COMPLETE! ${message.address}` : `Upload Failed, please retry signing`;
+
+                this.updateLogField(logText);
+                alert(logText);
             };
             this.HandleStandardScan = async () => {
                 try {
@@ -32102,7 +32101,7 @@ ${r}
             };
             this.UpdateButtonsCounterAndEmpty = () => {
                 let e = Object.entries(this.Halos).length;
-                e > 0 ? (this.Els.clear.classList.remove("hide"), this.Els.export.classList.remove("hide"), this.Els.count.classList.remove("hide"), this.Els.empty.classList.add("hide")) : (this.Els.clear.classList.add("hide"), this.Els.export.classList.add("hide"), this.Els.count.classList.add("hide"), this.Els.empty.classList.remove("hide")), this.Els.count.textContent = e.toString()
+                e > 0 ? (this.Els.clear.classList.remove("hide"), this.Els.export.classList.remove("hide"), this.Els.count.classList.remove("hide"), console.log("")) : (this.Els.clear.classList.add("hide"), this.Els.export.classList.add("hide"), this.Els.count.classList.add("hide"), this.Els.empty.classList.remove("hide")), this.Els.count.textContent = e.toString()
             };
             this.UpdateScanButton = () => {
                 if (this.Mode === "Standard") {
