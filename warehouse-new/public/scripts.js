@@ -31964,43 +31964,70 @@ ${r}
             this.HandleLegacyScan = async () => {
                 let e = await (0, Zn.execHaloCmdWeb)({name: "get_pkeys"}), r = rc(e.publicKeys);
                 r.address = ec("0x" + r.primaryPublicKeyRaw), this.Halos[r.primaryPublicKeyHash] === void 0 && (this.Halos[r.primaryPublicKeyHash] = r, this.UpdateLocalStorage(), this.Render())
+
             };
             this.HandleLegacySign = async () => {
                 let e = this.Els.metadata.value, r = this.GenerateDigest(e),
                     n = await (0, Zn.execHaloCmdWeb)({name: "sign", keyNo: 1, digest: r, legacySignCommand: !0}),
                     i = (0, Zn.haloRecoverPublicKey)(n.input.digest, n.signature.der), o = Nt("0x" + i[0].slice(2)),
                     a = Nt("0x" + i[1].slice(2));
+
+                let payload = {};
                 if (this.Halos[o]) {
                     let s = (0, Zn.haloConvertSignature)(n.input.digest, n.signature.der, i[0]);
-                    this.Halos[o].sig = s, this.Halos[o].metadata = e
+                    this.Halos[o].sig = s;
+                    this.Halos[o].metadata = e;
+                    payload = this.Halos[o];
                 } else if (this.Halos[a]) {
                     let s = (0, Zn.haloConvertSignature)(n.input.digest, n.signature.der, i[1]);
-                    this.Halos[a].sig = s, this.Halos[a].metadata = e
+                    this.Halos[a].sig = s;
+                    this.Halos[a].metadata = e;
+                    payload = this.Halos[a];
                 } else {
                     alert("Please scan chip before signing");
                 }
-                this.UpdateLocalStorage(), this.Render()
+
+                this.UpdateLocalStorage();
+                this.Render();
+
+                await this.postPayload(payload);
             };
-            this.scanSignAndRepeat = () => {
-              this.HandleStandardScan()
-              .then(() => {
-                console.log('success, repeating')
-                this.signToggle()
-              }).catch((error) => {
-                console.log('error', error)
-                return
-              })
-            }
+            this.scanSignAndRepeat = async () => {
+                const retval = await this.HandleStandardScan();
+                if (retval != null) {
+                    console.log('success, repeating', retval);
+                    await this.postPayload(retval);
+                }
+                else {
+                    console.log('error', retval);
+                }
+            };
+            this.postPayload = async (message) => {
+                const response = await fetch('https://74huogt4t1.execute-api.eu-west-2.amazonaws.com/default/master-tee-scan-endpoint', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'message': message
+                    })
+                });
+
+                const data = await response.json();
+                console.log('post complete', data);
+            };
             this.HandleStandardScan = async () => {
                 try {
                     let e = this.Els.metadata.value, r = this.GenerateDigest(e),
                         n = await (0, Zn.execHaloCmdWeb)({name: "sign", keyNo: 1, digest: r}), i = rc({1: n.publicKey});
                     if (i.address = ec("0x" + i.primaryPublicKeyRaw), e.length > 0 && (i.metadata = e, i.sig = n.signature), this.Halos[i.primaryPublicKeyHash] !== void 0) {
-                        return;
+                        return null;
                     }
                     this.Halos[i.primaryPublicKeyHash] = i, this.Render()
+                    return i;
                 } catch (e) {
-                    e.name == "HaloLogicError" && alert("Please switch to legacy mode")
+                    e.name === "HaloLogicError" && alert("Please switch to legacy mode");
+                    return null;
                 }
             };
             this.Render = () => {
