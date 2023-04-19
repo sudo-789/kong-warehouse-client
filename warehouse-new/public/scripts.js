@@ -31863,7 +31863,7 @@ ${r}
 
     var Zn = Wp(kP(), 1), sy = class {
         constructor() {
-            this.Mode = "Standard";
+            this.Mode = "Legacy";
             this.ReaderConnected = !1;
             this.Halos = {};
             this.Els = {
@@ -31962,11 +31962,14 @@ ${r}
                 this.Halos[n.primaryPublicKeyHash] = n, this.UpdateLocalStorage(), this.Render(), this.UpdateScanButton()
             };
             this.HandleLegacyScan = async () => {
+                this.updateLogField(`Awaiting Scan`);
                 let e = await (0, Zn.execHaloCmdWeb)({name: "get_pkeys"}), r = rc(e.publicKeys);
                 r.address = ec("0x" + r.primaryPublicKeyRaw), this.Halos[r.primaryPublicKeyHash] === void 0 && (this.Halos[r.primaryPublicKeyHash] = r, this.UpdateLocalStorage(), this.Render())
 
+                this.updateLogField(`Scan Complete ${r.address}`);
             };
             this.HandleLegacySign = async () => {
+                this.updateLogField(`Awaiting Sign`);
                 let e = this.Els.metadata.value, r = this.GenerateDigest(e),
                     n = await (0, Zn.execHaloCmdWeb)({name: "sign", keyNo: 1, digest: r, legacySignCommand: !0}),
                     i = (0, Zn.haloRecoverPublicKey)(n.input.digest, n.signature.der), o = Nt("0x" + i[0].slice(2)),
@@ -31987,6 +31990,8 @@ ${r}
                     alert("Please scan chip before signing");
                 }
 
+                this.updateLogField(`Sign Complete ${payload.address}`);
+
                 this.UpdateLocalStorage();
                 this.Render();
 
@@ -32003,6 +32008,7 @@ ${r}
                 }
             };
             this.postPayload = async (message) => {
+                this.updateLogField(`Uploading Results ${message.address}`);
                 const response = await fetch('https://74huogt4t1.execute-api.eu-west-2.amazonaws.com/default/master-tee-scan-endpoint', {
                     method: 'POST',
                     headers: {
@@ -32013,8 +32019,12 @@ ${r}
                     })
                 });
 
-                const data = await response.json();
-                console.log('post complete', data);
+                if (response.ok) {
+                    this.updateLogField(`COMPLETE! ${message.address}`);
+                }
+                else {
+                    this.updateLogField(`Upload Failed, please retry signing`);
+                }
             };
             this.HandleStandardScan = async () => {
                 try {
@@ -32029,6 +32039,10 @@ ${r}
                     e.name === "HaloLogicError" && alert("Please switch to legacy mode");
                     return null;
                 }
+            };
+            this.updateLogField = (logText) => {
+                const logField = document.getElementById("log-field");
+                logField.textContent = logText;
             };
             this.Render = () => {
                 if (this.Els.records.innerHTML = "", Object.entries(this.Halos).length > 0) {
