@@ -38,12 +38,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  background: linear-gradient(
-    95.58deg,
-    #fffcef -12.66%,
-    #ffb9d2 54.5%,
-    #ffd28f 108.52%
-  );
+  background: white;
 }
 
 h1,
