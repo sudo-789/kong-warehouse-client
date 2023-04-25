@@ -17,14 +17,20 @@
         <div class="box">
           <p class="empty">Tap Sign and hold Chip to phone NFC antenna.</p>
         </div>
+        <div>
+          <p>Response:</p>
+          <p id="response"></p>
 
+        </div>
         <div class="scan-form">
+          
+          <p class="feedback" id="feedback"></p>
           <input type="text" class="metadata-input" value="RSTLSS Master Tee" readonly>
           <button id="scan" class="scan-button" onClick="readKeyU2F();">
             Scan
           </button>
-          <button id="sign" class="sign-button" onClick="signU2F();">
-            Sign
+          <button id="sign" class="sign-button" onClick="setSignState();">
+            Start Signing
           </button>
         </div>
 
@@ -122,6 +128,7 @@
 
       // This shit is nasty.
       function unpackDERSignature(sig) {
+        try {
         let header0 = sig.slice(0, 2);
         if (parseInt("0x" + header0) !== 0x30) {
           throw Error("Invalid header.");
@@ -167,6 +174,10 @@
           r: r,
           s: s,
         };
+      } catch (error) {
+        console.log(error)
+        return 'An error occured, please check the console'
+      }
       }
 
       const staticHaloData = currentURL.searchParams.get("static");
@@ -296,15 +307,54 @@
             userVerification: "discouraged",
           },
         };
+        let xdd;
 
-        var xdd = await navigator.credentials.get(req);
-        return xdd.response.signature;
+        try {
+          xdd = await navigator.credentials.get(req);
+          return xdd.response.signature;
+        } catch (error) {
+          console.log(error)
+          return 'An error occured, please check the console'
+        }
       }
 
       // This runs a command to read out the public keys.
       async function readKeyU2F() {
         let res = await authU2F(fromHexString("02"));
         prepareVerify(res);
+      }
+
+      // Call sign function over and over when the toggle is pressed
+      let signState = false
+
+      function setSignState() {
+        let buttonText = document.getElementById('sign')
+        console.log('setting sign state')
+        if (signState === true) {
+          signState = false
+          buttonText.innerText = 'Start Signing'
+        } else {
+          signState = true
+          buttonText.innerText = 'Signing...'
+        }
+        console.log(signState)
+      }
+
+      setInterval(() => {
+        if (signState) {
+        signToggle()
+      }
+      }, "5000");
+
+      async function signToggle() {
+        if (signState) {
+          let message = await signU2F()
+          if (message === 'error') {
+            setSignState()
+          }
+        } else {
+          console.log('sign toggle false')
+        }
       }
 
       // Carry out a signature command against a HaLo.
@@ -320,14 +370,35 @@
 
         // Send the input bytes.
         var req = fromHexString(input);
-        var res = await authU2F(req);
+        
+        let res = await authU2F(req);
+
+        // Send response to front end
+        let response = document.getElementById('response')
+        response.innerText = res
+
+        // Catch an error in authU2F
+        if (res == 'An error occured, please check the console') {
+          let feedback = document.getElementById('feedback')
+          feedback.innerText = res
+          return 'error'
+        }
 
         // Grab the signature response.
         const signature = buf2hex(res);
-
+        
+        
+        
         // Strip out DER formatting to get r and s.
         const sigRaw = unpackDERSignature(signature);
 
+        // Catch an error in unpackDERSignature
+        if (sigRaw == 'An error occured, please check the console') {
+          let feedback = document.getElementById('feedback')
+          feedback.innerText = sigRaw
+          return 'error'
+        }
+        
         // SECP256k1 order constant
         let curveOrder =
           115792089237316195423570985008687907852837564279074904382605163141518161494337n;
@@ -391,6 +462,7 @@
         } else {
           // TODO: alert has not been scanned.
           alert("Please scan this chip first, then sign again.");
+          return 'error'
         }
       }
 

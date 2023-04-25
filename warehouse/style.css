@@ -304,6 +304,12 @@ svg {
   color: rgba(4, 3, 3, 0.45);
 }
 
+.feedback {
+  text-align: center;
+  padding-bottom: 12px;
+  color: red;
+}
+
 #export,
 #clear,
 #count {
